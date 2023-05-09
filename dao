@@ -1,0 +1,62 @@
+<?php 
+require_once("partenaire.php");
+
+class DAO{
+	 function getPDO(){
+         return new PDO("mysql:host=localhost;dbname=association","root","");
+	}
+	//-----------------------PARTENAIRE--------------------------
+	 function  enregistrerPartenaire($id_partenaire,$nom_partenaire_ ,$type_partenaire_,$description_,$description2,$date_debut,$date_fin,$image_partenaire_,$etat){
+		$pdo=$this->getPDO();
+		$res=$pdo->prepare("insert into partenaire(id_partenaire,nom_partenaire_,type_partenaire_,description_,date_debut,date_fin,image_partenaire_,etat) values(?,?,?,?,?,?,?); ");
+		$res->execute(array($id_partenaire,$nom_partenaire_ ,$type_partenaire_,$description_,$description2,$date_debut,$date_fin,$image_partenaire_,$etat));
+	}
+	 function  supprimerPartenaire($id_partenaire){
+		$pdo=DAO::getPDO();
+		$res=$pdo->prepare("delete from partenaire where id_partenaire=?;");
+		$res->execute(array($id_partenaire));
+	}	
+	function modifierPartenaire($id_partenaire, $nom_partenaire_, $type_partenaire_, $description_, $description2, $date_debut, $date_fin, $image_partenaire_, $etat){
+		$pdo = DAO::getPDO();
+		$res = $pdo->prepare("UPDATE partenaire SET nom_partenaire_ = ?, type_partenaire_ = ?, description_ = ?, description2 = ?, date_debut = ?, date_fin = ?, image_partenaire_ = ?, etat = ? WHERE id_partenaire = ?");
+		$res->execute(array($nom_partenaire_, $type_partenaire_, $description_, $description2, $date_debut, $date_fin, $image_partenaire_, $etat, $id_partenaire));
+	}
+	
+	 function  listePartenaire(){
+		$pdo=DAO::getPDO();
+		$res=$pdo->prepare("select * from partenaire");
+		$res->execute(array());
+		$lst=[];
+		while($row=$res->fetch()){
+			$lst[]=new partenaire($row["id_partenaire"],$row["nom_partenaire_"],$row["type_partenaire_"],$row["description_"],$row["description2"],$row["date_debut"],$row["date_fin"],$row["image_partenaire_"],$row["etat"]);
+		}
+		return $lst;
+	}
+
+	function getPartenaire($id_partenaire){
+		$pdo=$this->getPDO();
+		$res=$pdo->prepare("SELECT * FROM partenaire  where id_partenaire=?;");
+		$res->execute(array($id_partenaire));
+
+		if($ligne=$res->fetch()){
+			return new partenaire($ligne["id_partenaire"],$ligne["nom_partenaire_"],$ligne["type_partenaire_"],$ligne["description_"],$ligne["description2"],$ligne["date_debut"],$ligne["date_fin"],$ligne["image_partenaire_"],$ligne["etat"]);
+		}
+		return null;
+	}
+	public function recuperer_image_partenaire($id_partenaire){
+		$db = $this->getPDO();
+		$image = $db->prepare("select image_partenaire_ from partenaire where id_partenaire= ?");
+		$image->execute(array($id_partenaire));
+		return $image->fetch()[0];
+	}
+	public function last_id_partenaire(){
+		$db = $this->getPDO();
+		$id = $db->prepare("select max(id_partenaire) from partenaire");
+		$id->execute(array());
+		return $id->fetch()[0];
+	}
+	
+/*--------------------Sponsors------------------*/
+
+
+}
